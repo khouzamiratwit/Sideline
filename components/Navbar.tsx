@@ -25,6 +25,12 @@ export default function Navbar() {
           <Link href="/leagues" className="text-chalk-dim hover:text-signal-orange transition-colors">
             Leagues
           </Link>
+          <Link
+            href="/post/new"
+            className="text-xs bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card hover:opacity-90 transition-opacity"
+          >
+            New Thread
+          </Link>
           {editing ? (
             <input
               autoFocus
