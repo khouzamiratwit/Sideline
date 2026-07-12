@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Users ----------
+// Auth identity itself lives in Supabase Auth; this table mirrors the
+// subset of profile data our app needs to join against posts/comments.
+model User {
+  id        String    @id // matches Supabase auth.users.id
+  username  String    @unique
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+
+  posts     Post[]
+  comments  Comment[]
+  votes     Vote[]
+}
+
+// ---------- Community structure ----------
+// A "League" is the top-level community (NBA, World Cup, Premier League...)
+// A "Team" is scoped to a league. Posts can be tagged to a league and
+// optionally a specific team or game.
+model League {
+  id        String   @id            // e.g. "nba", "world-cup"
+  name      String                  // e.g. "NBA", "FIFA World Cup"
+  sportKey  String                  // internal key used by lib/sports-api adapters
+  teams     Team[]
+  posts     Post[]
+}
+
+model Team {
+  id         String   @id           // external API team id, namespaced e.g. "nba:lakers"
+  leagueId   String
+  league     League   @relation(fields: [leagueId], references: [id])
+  name       String
+  abbreviation String?
+  logoUrl    String?
+  posts      Post[]
+}
+
+// ---------- Content ----------
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  body        String?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  leagueId    String
+  league      League    @relation(fields: [leagueId], references: [id])
+  teamId      String?
+  team        Team?     @relation(fields: [teamId], references: [id])
+  gameId      String?   // external game id, e.g. "nba:2026-07-04:LAL@BOS" — lets us
+                         // auto-create "game thread" posts tied to a live game
+  createdAt   DateTime  @default(now())
+  comments    Comment[]
+  votes       Vote[]
+
+  @@index([leagueId, createdAt])
+  @@index([gameId])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id])
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  parentId  String?   // self-relation for nested replies
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  body      String
+  createdAt DateTime  @default(now())
+  votes     Vote[]
+
+  @@index([postId])
+  @@index([parentId])
+}
+
+// ---------- Voting ----------
+// Single Vote table for both posts and comments, distinguished by which
+// foreign key is set. `value` is +1 or -1.
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id])
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  value     Int      // 1 or -1
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}

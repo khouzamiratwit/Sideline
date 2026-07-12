@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Big Shoulders Display", sans-serif; /* condensed, scoreboard-digit feel */
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace; /* stat lines / box scores */
+}
+
+body {
+  background-color: #14181C;
+  color: #F2F3F0;
+}
+
+/* Visible keyboard focus everywhere -- don't rely on browser default alone */
+:focus-visible {
+  outline: 2px solid #FF6B35;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
