@@ -1,4 +1,4 @@
-# The Huddle — Sports Discussion Platform
+# Sideline — Sports Discussion Platform
 
 Reddit-style discussion, scoped to sports, with live scores pulled from
 external APIs and normalized across leagues.
