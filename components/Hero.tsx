@@ -14,7 +14,7 @@ export default function Hero() {
           takes, and connect with the sports community.
         </p>
         <Link
-          href="/games"
+          href="/post/new"
           className="inline-block mt-6 bg-signal-orange text-court-bg font-semibold px-5 py-2.5 rounded-card hover:opacity-90 transition-opacity"
         >
           Join the Conversation
