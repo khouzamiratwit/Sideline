@@ -2,19 +2,42 @@ import PostCard from "@/components/PostCard";
 import { FeedPost } from "@/types/post";
 import { getScoreboard } from "@/lib/sports-api";
 import { NormalizedGame } from "@/types/sports";
+import { prisma } from "@/lib/prisma";
 
 const LEAGUE_NAMES: Record<string, string> = {
   nba: "NBA",
   "world-cup": "World Cup",
 };
 
+// Queries the database directly instead of fetching our own API route --
+// avoids needing a site URL (which would break once deployed somewhere
+// other than localhost) and is faster since it skips an HTTP round trip.
 async function getFeed(leagueId: string): Promise<FeedPost[]> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/posts?league=${leagueId}`,
-    { cache: "no-store" }
-  );
-  if (!res.ok) return [];
-  return res.json();
+  const posts = await prisma.post.findMany({
+    where: { leagueId },
+    orderBy: { createdAt: "desc" },
+    take: 25,
+    include: {
+      author: { select: { username: true, avatarUrl: true } },
+      league: { select: { id: true, name: true } },
+      team: { select: { id: true, name: true, abbreviation: true } },
+      votes: true,
+      comments: { select: { id: true } },
+    },
+  });
+
+  return posts.map((p) => ({
+    id: p.id,
+    title: p.title,
+    body: p.body,
+    createdAt: p.createdAt.toISOString(),
+    author: p.author,
+    league: p.league,
+    team: p.team,
+    score: p.votes.reduce((sum, v) => sum + v.value, 0),
+    commentCount: p.comments.length,
+    userVote: 0 as 0, // TODO: fill from authenticated session once real auth exists
+  }));
 }
 
 export default async function LeaguePage({ params }: { params: { league: string } }) {
