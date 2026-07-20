@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     createdAt: c.createdAt.toISOString(),
     author: c.author,
     score: c.votes.reduce((sum, v) => sum + v.value, 0),
-    userVote: 0, // TODO: fill from authenticated session
+    userVote: 0,
   }));
 
   return NextResponse.json(shaped);
