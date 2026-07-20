@@ -9,9 +9,7 @@ const LEAGUE_NAMES: Record<string, string> = {
   "world-cup": "World Cup",
 };
 
-// Queries the database directly instead of fetching our own API route --
-// avoids needing a site URL (which would break once deployed somewhere
-// other than localhost) and is faster since it skips an HTTP round trip.
+
 async function getFeed(leagueId: string): Promise<FeedPost[]> {
   const posts = await prisma.post.findMany({
     where: { leagueId },
@@ -36,7 +34,7 @@ async function getFeed(leagueId: string): Promise<FeedPost[]> {
     team: p.team,
     score: p.votes.reduce((sum, v) => sum + v.value, 0),
     commentCount: p.comments.length,
-    userVote: 0 as 0, // TODO: fill from authenticated session once real auth exists
+    userVote: 0 as 0, 
   }));
 }
 

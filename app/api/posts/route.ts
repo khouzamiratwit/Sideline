@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     team: p.team,
     score: p.votes.reduce((sum, v) => sum + v.value, 0),
     commentCount: p.comments.length,
-    userVote: 0, // TODO: fill from the authenticated user's own vote once auth is wired in
+    userVote: 0, 
   }));
 
   return NextResponse.json(shaped);

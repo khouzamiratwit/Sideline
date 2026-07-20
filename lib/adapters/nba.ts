@@ -1,8 +1,6 @@
 import { NormalizedGame, NormalizedPlayerStatLine, SportsAdapter } from "@/types/sports";
 
-// Uses balldontlie.io as an example free NBA API. Swap the base URL / auth
-// header here if you move to SportsRadar or another provider -- nothing
-// outside this file needs to change.
+
 const BASE_URL = "https://api.balldontlie.io/v1";
 
 function authHeaders(): HeadersInit {
@@ -64,14 +62,7 @@ export const nbaAdapter: SportsAdapter = {
   },
 
   async getScoreboardRange(daysBack: number): Promise<NormalizedGame[]> {
-    // The API caps results at 100 per request and returns them in
-    // chronological order starting from the oldest date in range. A wide
-    // range (e.g. a full season) has 1000+ games, so a single query only
-    // ever surfaces the earliest slice -- recent games (like the Finals)
-    // would never show up. Fix: split into two windows and merge --
-    // a "recent" window (guaranteed to surface playoffs/Finals since it's
-    // narrow enough to fit under the 100-result cap) plus an "earlier"
-    // window for season variety, deduped together.
+  
     const recentDays = Math.min(daysBack, 45);
     const [recent, earlier] = await Promise.all([
       fetchRange(daysBack > 0 ? recentDays : 0),
@@ -83,10 +74,7 @@ export const nbaAdapter: SportsAdapter = {
   },
 
   async getGameBoxScore(gameId: string): Promise<NormalizedPlayerStatLine[]> {
-    // balldontlie's stats endpoint is keyed by their internal game id, not
-    // our namespaced one -- in a real build, store the raw id alongside the
-    // namespaced id when you first ingest the game. Stubbed here so the
-    // interface is clear.
+   
     const rawId = gameId.split(":").pop();
     const res = await fetch(`${BASE_URL}/stats?game_ids[]=${rawId}`, {
       headers: authHeaders(),

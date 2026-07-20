@@ -1,10 +1,8 @@
 import { NormalizedGame, NormalizedPlayerStatLine, SportsAdapter } from "@/types/sports";
 
-// Example using football-data.org's World Cup competition endpoint.
-// Free tier is rate-limited (10 req/min) -- the `next: { revalidate }` cache
-// below is doing real work here, not just a nicety.
+
 const BASE_URL = "https://api.football-data.org/v4";
-const COMPETITION = "WC"; // FIFA World Cup competition code
+const COMPETITION = "WC"; 
 
 function authHeaders(): HeadersInit {
   const token = process.env.FOOTBALL_DATA_API_KEY;

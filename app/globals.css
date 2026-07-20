@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --font-display: "Big Shoulders Display", sans-serif; /* condensed, scoreboard-digit feel */
+  --font-display: "Big Shoulders Display", sans-serif; 
   --font-body: "Inter", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace; /* stat lines / box scores */
+  --font-mono: "IBM Plex Mono", monospace; 
 }
 
 body {
@@ -13,7 +13,7 @@ body {
   color: #F2F3F0;
 }
 
-/* Visible keyboard focus everywhere -- don't rely on browser default alone */
+
 :focus-visible {
   outline: 2px solid #FF6B35;
   outline-offset: 2px;

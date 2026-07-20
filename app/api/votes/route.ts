@@ -8,9 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid vote payload" }, { status: 400 });
   }
 
-  // NOTE: userId should come from the authenticated session (Supabase),
-  // not the request body, once auth middleware is wired in. Left explicit
-  // here so the data flow is clear.
+
   if (!userId) {
     return NextResponse.json({ error: "not authenticated" }, { status: 401 });
   }

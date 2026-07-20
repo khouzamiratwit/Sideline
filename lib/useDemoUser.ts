@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-// Fast-path stand-in for real auth. Generates a random id + username on
-// first visit, stores both in localStorage, and upserts a matching User
-// row via /api/users so posts/comments/votes have a valid author. Swap
-// this out for real Supabase session data after the practice presentation.
+
 export function useDemoUser() {
   const [id, setId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -31,8 +28,7 @@ export function useDemoUser() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: storedId, username: storedName }),
     }).catch(() => {
-      // Non-fatal for the demo -- worst case, posting fails until this
-      // resolves on a later render/retry.
+  
     });
   }, []);
 

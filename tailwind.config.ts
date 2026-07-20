@@ -1,9 +1,5 @@
 import type { Config } from "tailwindcss";
 
-// Design tokens for the "scoreboard" visual identity:
-// - Deep charcoal court background, not the generic cream/serif AI look
-// - Condensed display face for scores/headers (scoreboard digit feel)
-// - Accent colors read as "live broadcast" rather than generic brand blue
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -13,19 +9,19 @@ const config: Config = {
     extend: {
       colors: {
         court: {
-          bg: "#14181C",       // near-black charcoal, like a dim arena
-          panel: "#1C2127",     // card/panel surface
-          line: "#2A3038",      // hairline dividers
+          bg: "#14181C",       
+          panel: "#1C2127",    
+          line: "#2A3038",   
         },
         chalk: {
-          DEFAULT: "#F2F3F0",  // primary text, off-white
-          dim: "#8B93A1",       // secondary/meta text
+          DEFAULT: "#F2F3F0", 
+          dim: "#8B93A1",     
         },
         signal: {
-          orange: "#FF6B35",   // primary accent - live/energy
-          blue: "#2E7DFF",     // links, secondary accent
-          green: "#2BA84A",    // positive score/live indicator
-          red: "#E5484D",      // negative vote / down
+          orange: "#FF6B35",   
+          blue: "#2E7DFF",    
+          green: "#2BA84A",  
+          red: "#E5484D",    
         },
       },
       fontFamily: {

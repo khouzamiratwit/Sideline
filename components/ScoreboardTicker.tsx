@@ -26,15 +26,13 @@ function TickerGame({ game }: { game: NormalizedGame }) {
   );
 }
 
-// Server component -- fetches once per request (adapters cache via
-// `next: { revalidate: 30 }`, so this stays cheap even with heavy traffic).
+
 export default async function ScoreboardTicker() {
   let games: NormalizedGame[] = [];
   try {
     games = await getAllScoreboards();
   } catch {
-    // Sports API down/unreachable shouldn't break the whole site --
-    // just hide the ticker.
+ 
     return null;
   }
 
@@ -46,7 +44,7 @@ export default async function ScoreboardTicker() {
     );
   }
 
-  // Duplicate the list so the CSS scroll loop is seamless.
+
   const doubled = [...games, ...games];
 
   return (

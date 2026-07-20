@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { league: string } }
 ) {
   const date = req.nextUrl.searchParams.get("date") ?? undefined;
-  const range = req.nextUrl.searchParams.get("range"); // e.g. "7" for last 7 days
+  const range = req.nextUrl.searchParams.get("range"); 
 
   try {
     const games = range
