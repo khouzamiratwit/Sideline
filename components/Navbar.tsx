@@ -15,14 +15,14 @@ export default function Navbar() {
         <Link href="/" className="font-display font-extrabold text-2xl tracking-tight text-chalk">
           SIDELINE
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link href="/" className="text-chalk-dim hover:text-signal-orange transition-colors">
+       <nav className="flex items-center gap-5 text-sm">
+          <Link href="/" className={navLinkClass("/")}>
             Home
           </Link>
-          <Link href="/games" className="text-chalk-dim hover:text-signal-orange transition-colors">
+          <Link href="/games" className={navLinkClass("/games")}>
             Games
           </Link>
-          <Link href="/leagues" className="text-chalk-dim hover:text-signal-orange transition-colors">
+          <Link href="/leagues" className={navLinkClass("/leagues")}>
             Leagues
           </Link>
           <Link
