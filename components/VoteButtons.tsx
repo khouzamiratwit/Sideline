@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { useDemoUser } from "@/lib/useDemoUser";
+import { useRouter } from "next/navigation";
+import { useCurrentUser } from "@/lib/useCurrentUser";
 
 interface VoteButtonsProps {
   targetType: "post" | "comment";
@@ -17,13 +18,18 @@ export default function VoteButtons({
   initialScore,
   initialUserVote = 0,
 }: VoteButtonsProps) {
-  const { id: userId } = useDemoUser();
+  const { user } = useCurrentUser();
+  const router = useRouter();
   const [score, setScore] = useState(initialScore);
   const [userVote, setUserVote] = useState<1 | -1 | 0>(initialUserVote);
   const [pending, setPending] = useState(false);
 
   async function cast(value: 1 | -1) {
-    if (pending || !userId) return;
+    if (!user) {
+      router.push("/auth/sign-in");
+      return;
+    }
+    if (pending) return;
     const next = userVote === value ? 0 : value;
     const delta = next - userVote;
     setScore((s) => s + delta);
@@ -33,7 +39,7 @@ export default function VoteButtons({
       const res = await fetch("/api/votes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetType, targetId, value: next, userId }),
+        body: JSON.stringify({ targetType, targetId, value: next, userId: user.id }),
       });
       if (!res.ok) throw new Error("vote failed");
     } catch {
