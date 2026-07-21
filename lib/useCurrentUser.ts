@@ -13,6 +13,15 @@ export function useCurrentUser() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  async function refresh() {
+    const res = await fetch("/api/users/me");
+    if (res.ok) {
+      setUser(await res.json());
+    } else {
+      setUser(null);
+    }
+  }
+
   useEffect(() => {
     const supabase = createClient();
 
@@ -22,13 +31,7 @@ export function useCurrentUser() {
         setLoading(false);
         return;
       }
-      const res = await fetch("/api/users/me");
-      if (res.ok) {
-        const dbUser = await res.json();
-        setUser(dbUser);
-      } else {
-        setUser(null);
-      }
+      await refresh();
       setLoading(false);
     }
 
@@ -48,5 +51,20 @@ export function useCurrentUser() {
     window.location.href = "/";
   }
 
-  return { user, loading, signOut };
+  async function updateUsername(newName: string): Promise<{ ok: boolean; error?: string }> {
+    const res = await fetch("/api/users/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: newName }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      return { ok: false, error: body.error ?? "Couldn't update name" };
+    }
+    const updated = await res.json();
+    setUser(updated);
+    return { ok: true };
+  }
+
+  return { user, loading, signOut, updateUsername };
 }
