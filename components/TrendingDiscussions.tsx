@@ -39,7 +39,7 @@ export default async function TrendingDiscussions() {
     <section className="py-6 border-t border-court-line">
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="font-display font-bold text-xl text-chalk">TRENDING DISCUSSIONS</h2>
-        <Link href="/" className="text-xs text-chalk-dim hover:text-signal-orange">
+        <Link href="/discussions" className="text-xs text-chalk-dim hover:text-signal-orange">
           View all discussions →
         </Link>
       </div>
