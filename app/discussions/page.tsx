@@ -36,10 +36,7 @@ export default async function DiscussionsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
         <h1 className="font-display font-extrabold text-3xl text-chalk">ALL DISCUSSIONS</h1>
-        
-          href="/post/new"
-          className="text-sm bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card hover:opacity-90 transition-opacity"
-        >
+        <a href="/post/new" className="text-sm bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card hover:opacity-90 transition-opacity">
           Start a thread
         </a>
       </div>
