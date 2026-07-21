@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDemoUser } from "@/lib/useDemoUser";
+import Link from "next/link";
+import { useCurrentUser } from "@/lib/useCurrentUser";
 
 const LEAGUES = [
   { id: "nba", label: "NBA" },
@@ -11,7 +12,7 @@ const LEAGUES = [
 
 export default function NewPostPage() {
   const router = useRouter();
-  const { id: userId } = useDemoUser();
+  const { user, loading } = useCurrentUser();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [leagueId, setLeagueId] = useState(LEAGUES[0].id);
@@ -23,17 +24,14 @@ export default function NewPostPage() {
       setError("Give your thread a title.");
       return;
     }
-    if (!userId) {
-      setError("Still setting up your account, try again in a second.");
-      return;
-    }
+    if (!user) return;
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, postBody: body, leagueId, authorId: userId }),
+        body: JSON.stringify({ title, postBody: body, leagueId, authorId: user.id }),
       });
       if (!res.ok) throw new Error();
       const post = await res.json();
@@ -43,6 +41,23 @@ export default function NewPostPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (loading) return null;
+
+  if (!user) {
+    return (
+      <div className="max-w-sm mx-auto flex flex-col gap-3 items-center text-center py-12">
+        <h1 className="font-display font-extrabold text-3xl text-chalk">START A THREAD</h1>
+        <p className="text-chalk-dim text-sm">Sign in to start a thread.</p>
+        <Link
+          href="/auth/sign-in"
+          className="bg-signal-orange text-court-bg font-semibold px-4 py-2 rounded-card"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
   }
 
   return (
