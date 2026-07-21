@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import useSWR from "swr";
 import VoteButtons from "./VoteButtons";
 import { FeedComment, CommentNode, buildCommentTree } from "@/types/comment";
-import { useDemoUser } from "@/lib/useDemoUser";
+import { useCurrentUser } from "@/lib/useCurrentUser";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -14,13 +15,14 @@ function CommentItem({
   postId,
   depth,
   onPosted,
+  userId,
 }: {
   node: CommentNode;
   postId: string;
   depth: number;
   onPosted: () => void;
+  userId: string | null;
 }) {
-  const { id: userId } = useDemoUser();
   const [replying, setReplying] = useState(false);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -57,9 +59,15 @@ function CommentItem({
           {formatDistanceToNow(new Date(node.createdAt), { addSuffix: true })}
         </div>
         <p className="text-sm text-chalk">{node.body}</p>
-        <button onClick={() => setReplying((r) => !r)} className="text-xs text-chalk-dim hover:text-signal-orange mt-1">
-          Reply
-        </button>
+        {userId ? (
+          <button onClick={() => setReplying((r) => !r)} className="text-xs text-chalk-dim hover:text-signal-orange mt-1">
+            Reply
+          </button>
+        ) : (
+          <Link href="/auth/sign-in" className="text-xs text-chalk-dim hover:text-signal-orange mt-1 inline-block">
+            Sign in to reply
+          </Link>
+        )}
         {replying && (
           <div className="mt-2 flex flex-col gap-2">
             <textarea
@@ -81,7 +89,7 @@ function CommentItem({
         {node.children.length > 0 && (
           <div className="mt-2 flex flex-col gap-2">
             {node.children.map((child) => (
-              <CommentItem key={child.id} node={child} postId={postId} depth={depth + 1} onPosted={onPosted} />
+              <CommentItem key={child.id} node={child} postId={postId} depth={depth + 1} onPosted={onPosted} userId={userId} />
             ))}
           </div>
         )}
@@ -91,19 +99,19 @@ function CommentItem({
 }
 
 export default function CommentThread({ postId }: { postId: string }) {
-  const { id: userId } = useDemoUser();
+  const { user } = useCurrentUser();
   const { data, isLoading, mutate } = useSWR<FeedComment[]>(`/api/comments?postId=${postId}`, fetcher);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function submitTopLevel() {
-    if (!newComment.trim() || submitting || !userId) return;
+    if (!newComment.trim() || submitting || !user) return;
     setSubmitting(true);
     try {
       await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, body: newComment, authorId: userId }),
+        body: JSON.stringify({ postId, body: newComment, authorId: user.id }),
       });
       setNewComment("");
       mutate();
@@ -118,26 +126,38 @@ export default function CommentThread({ postId }: { postId: string }) {
 
   return (
     <div className="flex flex-col gap-4 mt-6">
-      <div className="flex flex-col gap-2">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="bg-court-panel border border-court-line rounded-card p-3 text-sm text-chalk"
-          rows={3}
-          placeholder="Join the discussion..."
-        />
-        <button
-          onClick={submitTopLevel}
-          disabled={submitting}
-          className="self-start text-sm bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card disabled:opacity-50"
-        >
-          {submitting ? "Posting..." : "Comment"}
-        </button>
-      </div>
+      {user ? (
+        <div className="flex flex-col gap-2">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="bg-court-panel border border-court-line rounded-card p-3 text-sm text-chalk"
+            rows={3}
+            placeholder="Join the discussion..."
+          />
+          <button
+            onClick={submitTopLevel}
+            disabled={submitting}
+            className="self-start text-sm bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card disabled:opacity-50"
+          >
+            {submitting ? "Posting..." : "Comment"}
+          </button>
+        </div>
+      ) : (
+        <div className="border border-court-line rounded-card bg-court-panel p-4 text-center">
+          <p className="text-chalk-dim text-sm mb-2">Sign in to join the discussion.</p>
+          <Link
+            href="/auth/sign-in"
+            className="inline-block text-sm bg-signal-orange text-court-bg font-semibold px-3 py-1.5 rounded-card"
+          >
+            Sign in
+          </Link>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         {tree.length === 0 && <p className="text-chalk-dim text-sm">No comments yet — start the conversation.</p>}
         {tree.map((node) => (
-          <CommentItem key={node.id} node={node} postId={postId} depth={0} onPosted={() => mutate()} />
+          <CommentItem key={node.id} node={node} postId={postId} depth={0} onPosted={() => mutate()} userId={user?.id ?? null} />
         ))}
       </div>
     </div>
