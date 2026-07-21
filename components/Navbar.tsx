@@ -9,6 +9,14 @@ export default function Navbar() {
   const { username, setUsername } = useDemoUser();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  const pathname = usePathname();
+
+  function navLinkClass(href: string) {
+    const isActive = href === "/" ? pathname === "/" : pathname?.startsWith(href);
+    return isActive
+      ? "text-signal-orange font-semibold transition-colors"
+      : "text-chalk-dim hover:text-signal-orange transition-colors";
+  }
 
   return (
     <header className="border-b border-court-line bg-court-panel">
