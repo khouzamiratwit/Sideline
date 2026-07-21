@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { useDemoUser } from "@/lib/useDemoUser";
+import { useCurrentUser } from "@/lib/useCurrentUser";
 
 export default function Navbar() {
-  const { username, setUsername } = useDemoUser();
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState("");
+  const { user, loading, signOut } = useCurrentUser();
   const pathname = usePathname();
 
   function navLinkClass(href: string) {
@@ -24,7 +21,7 @@ export default function Navbar() {
         <Link href="/" className="font-display font-extrabold text-2xl tracking-tight text-chalk">
           SIDELINE
         </Link>
-       <nav className="flex items-center gap-5 text-sm">
+        <nav className="flex items-center gap-5 text-sm">
           <Link href="/" className={navLinkClass("/")}>
             Home
           </Link>
@@ -40,35 +37,25 @@ export default function Navbar() {
           >
             New Thread
           </Link>
-          {editing ? (
-            <input
-              autoFocus
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && draft.trim()) {
-                  setUsername(draft.trim());
-                  setEditing(false);
-                }
-              }}
-              className="bg-court-bg border border-court-line rounded-card px-2 py-1 text-xs text-chalk w-24"
-              placeholder="username"
-            />
-          ) : (
+          {loading ? null : user ? (
             <button
-              onClick={() => {
-                setDraft(username ?? "");
-                setEditing(true);
-              }}
+              onClick={signOut}
               className="flex items-center gap-1.5 text-chalk-dim hover:text-signal-orange transition-colors"
-              title="Click to change your display name"
+              title="Click to sign out"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
               </svg>
-              <span className="text-xs">{username ?? "..."}</span>
+              <span className="text-xs">{user.username}</span>
             </button>
+          ) : (
+            <Link
+              href="/auth/sign-in"
+              className="text-xs border border-court-line text-chalk px-3 py-1.5 rounded-card hover:border-signal-orange/50 transition-colors"
+            >
+              Sign in
+            </Link>
           )}
         </nav>
       </div>
